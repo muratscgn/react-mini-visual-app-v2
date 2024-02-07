@@ -1,24 +1,45 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { products as productsObject } from './data/products'
+import ImgNotSelected from './components/ImgNotSelected'
 import ImgContainer from './components/ImgContainer'
-import ImgNotSelected from "./components/ImgNotSelected"
-
 
 function App() {
-  const [activeProduct, setActiveProduct] = useState(productsObject.find(item => item.isActive))
   const [products, setProducts] = useState(productsObject)
+  const [activeProduct, setActiveProduct] = useState(
+    products.find(item => item.isActive)
+  )
 
-  function handleProductSelect(id) {
-    console.log(id)
+  function handleProductSelect(productId) {
+    const selectedProduct = productsObject.find(item => item.id === productId)
+    selectedProduct.isActive = true
+
+    setActiveProduct(selectedProduct)
+
+    const notSelectedProducts = productsObject.filter(
+      item => item.id !== productId
+    ).map(item => {
+      return {
+        ...item,
+        isActive: false
+      }
+    })
+
+    const newProducts = [
+      ...notSelectedProducts,
+      selectedProduct
+    ].sort((a, b) => a.id - b.id)
+
+    setProducts(newProducts)
+
   }
 
   return (
     <>
-      <main className='container'>
+      <main className="container">
         {
-          activeProduct ? <h1>{activeProduct.name}</h1> : <ImgNotSelected></ImgNotSelected>
+          activeProduct ? <img src={activeProduct.imgName} style={{ width: "100%" }} /> : <ImgNotSelected />
         }
-        <ImgContainer products={products} handleProductSelect={handleProductSelect}></ImgContainer>
+        <ImgContainer products={products} handleProductSelect={handleProductSelect} />
       </main>
     </>
   )
